@@ -1,14 +1,7 @@
-import React from 'react';
-import { Check, X } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { X } from 'lucide-react';
 import Link from 'next/link';
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-}
+import NotificationItem, { Notification } from './NotificationItem';
 
 interface NotificationTrayProps {
   isOpen: boolean;
@@ -47,55 +40,76 @@ const mockNotifications: Notification[] = [
 ];
 
 const NotificationTray: React.FC<NotificationTrayProps> = ({ isOpen, onClose }) => {
+  const trayRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (trayRef.current && !trayRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
+  const handleMarkAsRead = (id: string) => {
+    // In a real app, this would update the notification state
+    console.log(`Marking notification ${id} as read`);
+  };
+
+  const handleMarkAllAsRead = () => {
+    // In a real app, this would update all notifications
+    console.log('Marking all notifications as read');
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-16 right-0 w-80 max-h-[500px] overflow-y-auto bg-white dark:bg-gray-900 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 z-50">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="font-semibold text-lg">Notifications</h3>
+    <div
+      ref={trayRef}
+      className="absolute top-12 right-0 w-80 max-h-[500px] overflow-y-auto bg-black border border-gray-800 dark:border-gray-700 rounded-lg shadow-xl z-50"
+    >
+      <div className="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
+        <h3 className="font-semibold text-lg text-white">Notifications</h3>
         <div className="flex space-x-2">
-          <button className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
+          <button 
+            className="text-xs text-blue-400 hover:underline"
+            onClick={handleMarkAllAsRead}
+          >
             Mark all as read
           </button>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-300">
             <X size={16} />
           </button>
         </div>
       </div>
       
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="divide-y divide-gray-800 dark:divide-gray-700">
         {mockNotifications.length > 0 ? (
           mockNotifications.map((notification) => (
-            <div 
+            <NotificationItem 
               key={notification.id} 
-              className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-                !notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-              }`}
-            >
-              <div className="flex justify-between">
-                <h4 className="font-medium text-sm">{notification.title}</h4>
-                <span className="text-xs text-gray-500 dark:text-gray-400">{notification.time}</span>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{notification.message}</p>
-              <div className="flex justify-end mt-2">
-                <button className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center">
-                  <Check size={12} className="mr-1" />
-                  Mark as read
-                </button>
-              </div>
-            </div>
+              notification={notification} 
+              onMarkAsRead={handleMarkAsRead}
+            />
           ))
         ) : (
-          <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+          <div className="p-4 text-center text-gray-400">
             No new notifications
           </div>
         )}
       </div>
       
-      <div className="p-3 border-t border-gray-200 dark:border-gray-700 text-center">
+      <div className="p-3 border-t border-gray-800 dark:border-gray-700 text-center">
         <Link 
-          href="/notifications" 
-          className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+          href="/app/notifications" 
+          className="text-sm text-blue-400 hover:underline"
           onClick={onClose}
         >
           View all notifications

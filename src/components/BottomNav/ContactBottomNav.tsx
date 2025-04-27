@@ -36,25 +36,25 @@ export const ContactBottomNav: React.FC<ContactBottomNavProps> = ({ contactId })
   const navItems: NavItem[] = [
     {
       label: 'Profile',
-      href: `/leads/${contactId}`,
+      href: `/app/leads/${contactId}`,
       icon: <UserCircle size={20} />,
       isActive: activeTab === 'profile'
     },
     {
       label: 'Campaigns',
-      href: `/leads/${contactId}/campaigns`,
+      href: `/app/leads/${contactId}/campaigns`,
       icon: <Megaphone size={20} />,
       isActive: activeTab === 'campaigns'
     },
     {
       label: 'AI Chat',
-      href: `/leads/${contactId}/chat`,
+      href: `/app/leads/${contactId}/chat`,
       icon: <MessageSquareText size={20} />,
       isActive: activeTab === 'chat'
     },
     {
       label: 'Tasks',
-      href: `/leads/${contactId}/tasks`,
+      href: `/app/leads/${contactId}/tasks`,
       icon: <ListTodo size={20} />,
       isActive: activeTab === 'tasks'
     },
